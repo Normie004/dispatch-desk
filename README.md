@@ -13,6 +13,8 @@ From the extracted dispatch-desk directory, run `python3 server.py` (Python 3.9 
 3. Choose New update and load Revised Queen St window. Its tentative wording produces a clarification request. The confirmed date stays in the register.
 4. Load King St access request. Two cities have a King St order. Choose the correct order before approving. Activity records the decision alongside its source update.
 
+5. Load **Queen St confirmed reschedule** and click **Analyze update**. Compare the original November 27 confirmation with the new November 30 carrier message. Choose **Accept new date**, then open **Activity** to see the change. Choosing **Keep current date** keeps November 27 on the order.
+
 ## Run live AI extraction
 
 Install and launch Ollama on the same computer. In Terminal, download a model with `ollama pull qwen2.5:7b`. Model downloads require network access, disk space, and enough memory to run the model. Stop the desk if it is already running. From the project directory launch `DISPATCH_MODEL=qwen2.5:7b python3 server.py`. Any other locally installed chat model can be selected by its Ollama model name.
@@ -21,7 +23,7 @@ Choose New update → Write a custom update. Try “The carrier has confirmed th
 
 ## Architecture
 
-The browser submits correspondence to a local Python HTTP server. Three exact sample messages with their original received date use pre-recorded extractions labeled Sample replay. Other messages go through the local model. SQLite stores incoming messages, proposals, orders, tasks, and audit entries. Each review decision commits together with its order or task change. Identical message bodies received on the same date reuse their first extraction. Follow-up drafts use templates.
+The browser submits correspondence to a local Python HTTP server. Built-in sample messages with their original received date use pre-recorded extractions labeled Sample replay. Other messages go through the local model. SQLite stores incoming messages, proposals, orders, tasks, and audit entries. Each review decision commits together with its order or task change. Identical message bodies received on the same date reuse their first extraction. Follow-up drafts use templates.
 
 ## Development
 
