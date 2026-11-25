@@ -33,6 +33,7 @@ function dateReview(select) {
   approve.dataset.decision = changed ? 'reschedule' : 'approve';
   approve.dataset.previous = changed ? o.install : '';
   approve.textContent = changed ? 'Accept new date' : 'Approve';
+  dismiss.dataset.previous = approve.dataset.previous;
   dismiss.textContent = changed ? 'Keep current date' : 'Dismiss';
   if (!changed) return;
   const last = data.audit.slice().reverse().map(a => data.proposals.find(x => x.id === a.pid))

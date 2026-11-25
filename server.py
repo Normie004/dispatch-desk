@@ -129,14 +129,17 @@ def decide(pid, action, oid, previous=None):
         p=db.execute("SELECT * FROM proposals WHERE id=?",(pid,)).fetchone()
         if not p or p["state"]!="pending": raise ValueError("Already reviewed or unavailable. Refresh the desk.")
         note="Dismissed proposal"
-        if action in ("approve","reschedule"):
+        keep_date = action == "dismiss" and bool(previous)
+        if action != "dismiss" or keep_date:
             o=db.execute("SELECT * FROM orders WHERE id=?",(oid,)).fetchone()
             if not o or o["site"]!=p["site"] or (p["city"] and o["city"]!=p["city"]): raise ValueError("Select a matching order first.")
             conflict = p["kind"] == "confirm" and o["install"] and o["install"] != p["target"]
-            if conflict or action == "reschedule":
-                if not conflict or action != "reschedule" or previous != o["install"]:
+            if conflict or action == "reschedule" or keep_date:
+                if not conflict or action == "approve" or previous != o["install"]:
                     raise ValueError("The install date needs review. Check the current date and try again.")
-            if p["kind"]=="confirm":
+            if keep_date:
+                note = f"{oid} · Kept install date {o['install']} (declined {p['target']})"
+            elif p["kind"]=="confirm":
                 db.execute("UPDATE orders SET install=? WHERE id=?",(p["target"],oid))
                 note=f"{oid} · Install date: {o['install'] or 'unscheduled'} → {p['target']}"
             else:

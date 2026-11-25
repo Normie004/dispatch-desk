@@ -13,7 +13,13 @@ class DateReviewTest(unittest.TestCase):
                 db.execute("UPDATE orders SET install='2026-12-08' WHERE id='ORD-1120'")
                 for pid in [20,21]:
                     db.execute("INSERT INTO proposals(id,mid,site,city,kind,quote,target) VALUES (?,1,'Front St','Toronto','confirm','Confirmed','2026-12-10')",(pid,))
-            server.decide(20, "dismiss", "ORD-1120")
+            with self.assertRaises(ValueError):
+                server.decide(20, "dismiss", "ORD-1120", "2026-12-07")
+            server.decide(20, "dismiss", "ORD-1120", "2026-12-08")
+            state = server.state()
+            self.assertEqual(state["audit"][-1]["note"],
+                             "ORD-1120 · Kept install date 2026-12-08 (declined 2026-12-10)")
+            self.assertEqual(next(p["state"] for p in state["proposals"] if p["id"] == 20), "dismissed")
             for action, old in [("approve",None),("reschedule","2026-12-07")]:
                 with self.assertRaises(ValueError):
                     server.decide(21, action, "ORD-1120", old)
